@@ -1,0 +1,47 @@
+@startuml
+' This magic line fixes the messy layout!
+left to right direction
+
+actor "HR Advisor" as HR
+actor "Department Manager" as DM
+database "MySQL Database" as DB
+
+rectangle "HR System" {
+usecase "Get all salaries" as UC1
+usecase "Get salaries by dept" as UC2
+usecase "Get dept salaries (Manager)" as UC3
+usecase "Get salaries by role" as UC4
+usecase "Add employee" as UC5
+usecase "View employee details" as UC6
+usecase "Update employee" as UC7
+usecase "Delete employee" as UC8
+usecase "Print Report" as UCa
+}
+
+' Connect Actors to Use Cases
+HR --> UC1
+HR --> UC2
+DM --> UC3
+HR --> UC4
+HR --> UC5
+HR --> UC6
+HR --> UC7
+HR --> UC8
+
+' Include relationships
+UC1 ..> UCa : include
+UC2 ..> UCa : include
+UC3 ..> UCa : include
+UC4 ..> UCa : include
+
+' Connect Use Cases to Database
+UC1 --> DB
+UC2 --> DB
+UC3 --> DB
+UC4 --> DB
+UC5 --> DB
+UC6 --> DB
+UC7 --> DB
+UC8 --> DB
+
+@enduml

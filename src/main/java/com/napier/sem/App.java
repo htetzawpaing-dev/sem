@@ -1,6 +1,7 @@
 package com.napier.sem;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class App {
     private Connection con = null;
@@ -93,11 +94,69 @@ public class App {
         }
     }
 
+    /**
+     * Gets all the current employees and salaries.
+     * @param role The job title to search for.
+     * @return A list of all employees with that role, or null if there is an error.
+     */
+    public ArrayList<Employee> getSalariesByRole(String role) {
+        try {
+            Statement stmt = con.createStatement();
+            String strSelect =
+                    "SELECT employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+                            + "FROM employees, salaries, titles "
+                            + "WHERE employees.emp_no = salaries.emp_no "
+                            + "AND employees.emp_no = titles.emp_no "
+                            + "AND salaries.to_date = '9999-01-01' "
+                            + "AND titles.to_date = '9999-01-01' "
+                            + "AND titles.title = '" + role + "' "
+                            + "ORDER BY employees.emp_no ASC";
+
+            ResultSet rset = stmt.executeQuery(strSelect);
+            ArrayList<Employee> employees = new ArrayList<Employee>();
+            while (rset.next()) {
+                Employee emp = new Employee();
+                emp.emp_no = rset.getInt("emp_no");
+                emp.first_name = rset.getString("first_name");
+                emp.last_name = rset.getString("last_name");
+                emp.salary = rset.getInt("salary");
+                employees.add(emp);
+            }
+            return employees;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to get salary details");
+            return null;
+        }
+    }
+
+    /**
+     * Prints a list of employees.
+     * @param employees The list of employees to print.
+     */
+    public void printSalaries(ArrayList<Employee> employees) {
+        if (employees == null) {
+            System.out.println("No employees");
+            return;
+        }
+        System.out.println(String.format("%-10s %-15s %-20s %-8s", "Emp No", "First Name", "Last Name", "Salary"));
+        for (Employee emp : employees) {
+            if (emp == null) continue;
+            String emp_string =
+                    String.format("%-10s %-15s %-20s %-8s",
+                            emp.emp_no, emp.first_name, emp.last_name, emp.salary);
+            System.out.println(emp_string);
+        }
+    }
+
     public static void main(String[] args) {
         App a = new App();
         a.connect();
-        Employee emp = a.getEmployee(255530);
-        a.displayEmployee(emp);
+
+        // Extract salary information for Engineers
+        ArrayList<Employee> employees = a.getSalariesByRole("Engineer");
+        a.printSalaries(employees);
+
         a.disconnect();
     }
 }
