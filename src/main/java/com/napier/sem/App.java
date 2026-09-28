@@ -182,11 +182,8 @@ public class App {
         // Extract all employee salary information
         ArrayList<Employee> employees = a.getAllSalaries();
 
-        // Test the size of the returned data - should be 240124
-        if (employees != null) {
-            System.out.println("Total records found: " + employees.size());
-            // We only print a small summary here so the console doesn't freeze with 240k lines!
-        }
+        // Print the formatted list of all salaries
+        a.printSalaries(employees);
 
         a.disconnect();
     }
