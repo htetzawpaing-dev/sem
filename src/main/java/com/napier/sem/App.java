@@ -94,11 +94,6 @@ public class App {
         }
     }
 
-    /**
-     * Gets all the current employees and salaries.
-     * @param role The job title to search for.
-     * @return A list of all employees with that role, or null if there is an error.
-     */
     public ArrayList<Employee> getSalariesByRole(String role) {
         try {
             Statement stmt = con.createStatement();
@@ -120,6 +115,37 @@ public class App {
                 emp.first_name = rset.getString("first_name");
                 emp.last_name = rset.getString("last_name");
                 emp.salary = rset.getInt("salary");
+                employees.add(emp);
+            }
+            return employees;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to get salary details");
+            return null;
+        }
+    }
+
+    /**
+     * Gets all the current employees and salaries.
+     * @return A list of all employees and salaries, or null if there is an error.
+     */
+    public ArrayList<Employee> getAllSalaries() {
+        try {
+            Statement stmt = con.createStatement();
+            String strSelect =
+                    "SELECT employees.emp_no, employees.first_name, employees.last_name, salaries.salary "
+                            + "FROM employees, salaries "
+                            + "WHERE employees.emp_no = salaries.emp_no AND salaries.to_date = '9999-01-01' "
+                            + "ORDER BY employees.emp_no ASC";
+
+            ResultSet rset = stmt.executeQuery(strSelect);
+            ArrayList<Employee> employees = new ArrayList<Employee>();
+            while (rset.next()) {
+                Employee emp = new Employee();
+                emp.emp_no = rset.getInt("employees.emp_no");
+                emp.first_name = rset.getString("employees.first_name");
+                emp.last_name = rset.getString("employees.last_name");
+                emp.salary = rset.getInt("salaries.salary");
                 employees.add(emp);
             }
             return employees;
@@ -153,9 +179,14 @@ public class App {
         App a = new App();
         a.connect();
 
-        // Extract salary information for Engineers
-        ArrayList<Employee> employees = a.getSalariesByRole("Engineer");
-        a.printSalaries(employees);
+        // Extract all employee salary information
+        ArrayList<Employee> employees = a.getAllSalaries();
+
+        // Test the size of the returned data - should be 240124
+        if (employees != null) {
+            System.out.println("Total records found: " + employees.size());
+            // We only print a small summary here so the console doesn't freeze with 240k lines!
+        }
 
         a.disconnect();
     }
